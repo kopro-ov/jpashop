@@ -8,7 +8,6 @@ import com.jpabook.jpashop.domain.item.Book;
 import com.jpabook.jpashop.domain.item.Item;
 import com.jpabook.jpashop.exception.NotEnoughStockException;
 import com.jpabook.jpashop.repository.OrderRepository;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,7 @@ public class OrderServiceTest {
         //given
         Member member = createMember();
 
-        Book book = createBook();
+        Book book = createBook("시골 JPA", 10000, 10);
 
         //when
         int orderCount = 2;
@@ -50,13 +49,18 @@ public class OrderServiceTest {
     }
 
     @Test(expected = NotEnoughStockException.class)
-    public void 상품주문_재고수량초가() throws Exception {
+    public void 상품주문_재고수량초과() throws Exception {
         //given
+        Member member = createMember();
+        Item item = createBook("시골 JPA", 10000, 10);
 
+        int orderCount = 11;
 
         //when
+        orderService.order(member.getId(), item.getId(), orderCount);
 
         //then
+        fail("재고 수량 부족 예외가 발생해야 한다.");
     }
 
     @Test
@@ -68,20 +72,11 @@ public class OrderServiceTest {
         //then
     }
 
-    @Test
-    public void 상품주문_재고수량초과() throws Exception {
-        //given
-
-        //when
-
-        //then
-    }
-
-    private Book createBook() {
+    private Book createBook(String name, int price, int stockQuantity) {
         Book book = new Book();
-        book.setName("시골 JPA");
-        book.setPrice(10000);
-        book.setStockQuantity(10);
+        book.setName(name);
+        book.setPrice(price);
+        book.setStockQuantity(stockQuantity);
         em.persist(book);
         return book;
     }
