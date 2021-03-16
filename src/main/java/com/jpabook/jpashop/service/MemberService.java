@@ -1,10 +1,8 @@
 package com.jpabook.jpashop.service;
 
-import com.jpabook.jpashop.MemberRepository;
 import com.jpabook.jpashop.domain.Member;
-import lombok.AllArgsConstructor;
+import com.jpabook.jpashop.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +30,7 @@ public class MemberService {
     private void validateDuplicateMember(Member member) {
         //EXCEPTION
         List<Member> findMembers = memberRepository.findByName(member.getName());
-        if(findMembers.isEmpty()) {
+        if(!findMembers.isEmpty()) {
             throw new IllegalStateException("이미 존재하는 회원입니다.");
         }
     }
