@@ -6,6 +6,7 @@ import com.jpabook.jpashop.domain.Order;
 import com.jpabook.jpashop.domain.OrderStatus;
 import com.jpabook.jpashop.domain.item.Book;
 import com.jpabook.jpashop.domain.item.Item;
+import com.jpabook.jpashop.exception.NotEnoughStockException;
 import com.jpabook.jpashop.repository.OrderRepository;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,17 +32,10 @@ public class OrderServiceTest {
     @Test
     public void 상품주문() throws Exception {
         //given
-        Member member = new Member();
-        member.setName("회원1");
-        member.setAddress(new Address("서울", "강가","123-123"));
-        em.persist(member);
+        Member member = createMember();
 
-        Book book = new Book();
-        book.setName("시골 JPA");
-        book.setPrice(10000);
-        book.setStockQuantity(10);
-        em.persist(book);
-        
+        Book book = createBook();
+
         //when
         int orderCount = 2;
         Long orderId = orderService.order(member.getId(), book.getId(), orderCount);
@@ -53,6 +47,16 @@ public class OrderServiceTest {
         assertEquals("주문한 상품 종류 수가 정확해야한다.", 1, getOrder.getOrderItems().size());
         assertEquals("주문 가격은 가격 * 수량이다", 10000 * orderCount, getOrder.getTotalPrice());
         assertEquals("주문 수량만큼 재고가 줄어야 한다.", 8, book.getStockQuantity());
+    }
+
+    @Test(expected = NotEnoughStockException.class)
+    public void 상품주문_재고수량초가() throws Exception {
+        //given
+
+
+        //when
+
+        //then
     }
 
     @Test
@@ -71,6 +75,23 @@ public class OrderServiceTest {
         //when
 
         //then
+    }
+
+    private Book createBook() {
+        Book book = new Book();
+        book.setName("시골 JPA");
+        book.setPrice(10000);
+        book.setStockQuantity(10);
+        em.persist(book);
+        return book;
+    }
+
+    private Member createMember() {
+        Member member = new Member();
+        member.setName("회원1");
+        member.setAddress(new Address("서울", "강가","123-123"));
+        em.persist(member);
+        return member;
     }
 
 }
